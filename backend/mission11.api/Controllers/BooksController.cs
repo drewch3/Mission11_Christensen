@@ -1,4 +1,4 @@
-﻿//Drew Christensen Seciton 3
+﻿// Drew Christensen Section 3
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,40 +18,68 @@ namespace mission11.API.Controllers
             _context = context;
         }
 
-       [HttpGet]
-public async Task<IActionResult> GetBooks(
-    [FromQuery] int pageNumber = 1,
-    [FromQuery] int pageSize = 5,
-    [FromQuery] string? sortBy = "Title",
-    [FromQuery] string sortOrder = "asc")
-{
-    if (pageNumber < 1) pageNumber = 1;
-    if (pageSize < 1) pageSize = 1;
+        // ✅ Get a paginated list of books with optional category and sorting
+        [HttpGet]
+        public async Task<IActionResult> GetBooks(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 6,
+            [FromQuery] string? sortBy = "Title",
+            [FromQuery] string sortOrder = "asc",
+            [FromQuery] string? category = null)
+        {
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 1;
 
-    IQueryable<Book> query = _context.Books.AsQueryable();
+            IQueryable<Book> query = _context.Books.AsQueryable();
 
-    // Sorting logic
-    if (!string.IsNullOrEmpty(sortBy) && sortBy.Equals("Title", StringComparison.OrdinalIgnoreCase))
-    {
-        query = sortOrder == "desc" ? query.OrderByDescending(b => b.Title) : query.OrderBy(b => b.Title);
+            // ✅ Improved category filter
+            if (!string.IsNullOrEmpty(category) && category != "All" && category != "undefined")
+            {
+                query = query.Where(b => b.Category == category);
+            }
+
+            // ✅ Apply sorting based on Title or BookID
+            if (!string.IsNullOrEmpty(sortBy) && sortBy.Equals("Title", StringComparison.OrdinalIgnoreCase))
+            {
+                query = sortOrder == "desc"
+                    ? query.OrderByDescending(b => b.Title)
+                    : query.OrderBy(b => b.Title);
+            }
+            else
+            {
+                query = query.OrderBy(b => b.BookID);
+            }
+
+            // ✅ Get total record count before applying pagination
+            var totalRecords = await query.CountAsync();
+
+            // ✅ Apply pagination
+            var books = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return Ok(new
+            {
+                totalRecords,
+                pageNumber,
+                pageSize,
+                books
+            });
+        }
+
+        // ✅ Get distinct list of categories for filtering
+        [HttpGet("categories")]
+        public async Task<IActionResult> GetCategories()
+        {
+            var categories = await _context.Books
+                .Select(b => b.Category)
+                .Where(c => c != null)
+                .Distinct()
+                .OrderBy(c => c)
+                .ToListAsync();
+
+            return Ok(categories);
+        }
     }
-    else
-    {
-        query = query.OrderBy(b => b.BookID);
-    }
-
-    var totalRecords = await query.CountAsync();
-    var books = await query
-        .Skip((pageNumber - 1) * pageSize)  // ✅ Apply correct pagination
-        .Take(pageSize)
-        .ToListAsync();
-
-    return Ok(new
-    {
-        totalRecords,
-        pageNumber,
-        pageSize,
-        books
-        });}
-
-    }}
+}

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "4BcqUWwLWY8=",
+  "dgSpecHash": "bbufm77Jd/E=",
   "success": true,
-  "projectFilePath": "C:\\Users\\drewc\\OneDrive\\Desktop\\mission11\\backend\\mission11.api\\mission11.API.csproj",
+  "projectFilePath": "C:\\Users\\drewc\\OneDrive\\Documents\\IS 413\\Mission11_Christensen\\backend\\mission11.api\\mission11.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\drewc\\.nuget\\packages\\microsoft.data.sqlite.core\\8.0.14\\microsoft.data.sqlite.core.8.0.14.nupkg.sha512",
     "C:\\Users\\drewc\\.nuget\\packages\\microsoft.entityframeworkcore\\8.0.14\\microsoft.entityframeworkcore.8.0.14.nupkg.sha512",

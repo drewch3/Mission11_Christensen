@@ -1,140 +1,108 @@
-//Drew Christensen Seciton 3
+// Drew Christensen Section 3
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
-interface Book {
-  bookID: number;
-  title: string;
-  author: string;
-  publisher: string;
-  isbn: string;
-  classification: string;
-  category: string;
-  pageCount: number;
-  price: number;
-}
+import BookCard from './BookCard';
+import CartSummary from './CartSummary';
+import CategoryFilter from './CategoryFilter';
+import { Book, CartItem } from '../types';
+import { Toast, ToastContainer } from 'react-bootstrap'; // ✅ Import Toast
 
 const BookList: React.FC = () => {
   const [books, setBooks] = useState<Book[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [page, setPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(5);
-  const [totalCount, setTotalCount] = useState<number>(0);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-
-  const API_URL = 'http://localhost:5056/api/Books';
-
-  const fetchBooks = async () => {
-    try {
-      console.log(`Fetching books - Page: ${page}, PageSize: ${pageSize}`);
-  
-      const response = await axios.get(API_URL, {
-        params: { pageNumber: page, pageSize: pageSize, sortBy: "Title", sortOrder }
-      });
-  
-      console.log("API Raw Response:", response.data); // ✅ Debugging
-  
-      if (response.data && response.data.books) {
-        setBooks(response.data.books); // ✅ Ensure books are correctly extracted
-        setTotalCount(response.data.totalRecords || 0);
-      } else {
-        console.warn("Invalid API response:", response.data);
-        setBooks([]);
-      }
-    } catch (error) {
-      console.error("Error fetching books:", error);
-      setBooks([]);
-    }
-  };  
+  const [totalRecords, setTotalRecords] = useState<number>(0);
+  const [showToast, setShowToast] = useState<boolean>(false); // ✅ State for Toast
+  const pageSize = 6;
 
   useEffect(() => {
-    fetchBooks();
-  }, [page, pageSize, sortOrder]); // ✅ Ensures fetchBooks is called when page updates
+    // Get books for current page and selected category
+    axios
+      .get(`/api/books?pageNumber=${page}&pageSize=${pageSize}&category=${selectedCategory || 'All'}`)
+      .then((res) => {
+        setBooks(res.data.books);
+        setTotalRecords(res.data.totalRecords);
+      });
 
-  const totalPages = Math.ceil(totalCount / pageSize);
+    // ✅ Get all categories for dropdown
+    axios
+      .get('/api/books/categories')
+      .then((res) => {
+        setCategories(res.data);
+      });
 
-  const handleSortByTitle = () => {
-    setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    const storedCart = localStorage.getItem('cart');
+    if (storedCart) setCart(JSON.parse(storedCart));
+  }, [page, selectedCategory]);
+
+  // ✅ Add book to cart with toast notification
+  const addToCart = (book: Book) => {
+    const existing = cart.find((item) => item.book.bookID === book.bookID);
+    const updated = existing
+      ? cart.map((item) =>
+          item.book.bookID === book.bookID ? { ...item, quantity: item.quantity + 1 } : item
+        )
+      : [...cart, { book, quantity: 1 }];
+
+    setCart(updated);
+    localStorage.setItem('cart', JSON.stringify(updated));
+
+    // ✅ Show toast notification
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
   };
 
   return (
     <div className="container mt-4">
-      <h2>Online Bookstore</h2>
-
-      <table className="table table-striped">
-        <thead>
-          <tr>
-            <th style={{ cursor: 'pointer' }} onClick={handleSortByTitle}>
-              Title {sortOrder === 'asc' ? '▲' : '▼'}
-            </th>
-            <th>Author</th>
-            <th>Publisher</th>
-            <th>ISBN</th>
-            <th>Classification</th>
-            <th>Category</th>
-            <th>Page Count</th>
-            <th>Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          {books.length > 0 ? (
-            books.map(book => (
-              <tr key={book.bookID}>
-                <td>{book.title}</td>
-                <td>{book.author}</td>
-                <td>{book.publisher}</td>
-                <td>{book.isbn}</td>
-                <td>{book.classification}</td>
-                <td>{book.category}</td>
-                <td>{book.pageCount}</td>
-                <td>${book.price.toFixed(2)}</td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={8} className="text-center">
-                No books available
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-
-      {/* Pagination */}
-      <div className="d-flex justify-content-center mt-3">
-        <ul className="pagination">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map(pg => (
-            <li key={pg} className={`page-item ${page === pg ? 'active' : ''}`}>
-              <button
-                className="page-link"
-                onClick={() => {
-                  console.log(`Changing to page: ${pg}`);
-                  setPage(pg);
-                }}
-              >
-                {pg}
-              </button>
-            </li>
-          ))}
-        </ul>
+      <CartSummary cart={cart} />
+      <CategoryFilter
+        categories={categories}
+        selected={selectedCategory}
+        onSelect={(cat) => {
+          setSelectedCategory(cat);
+          setPage(1); // <-- Reset page when switching category
+        }}
+      />
+      <div className="row">
+        {books.map((book) => (
+          <BookCard key={book.bookID} book={book} onAdd={addToCart} />
+        ))}
       </div>
 
-      {/* Change number of results per page */}
-      <div className="mt-3">
-        <label>Results per page:</label>
-        <select
-          className="ms-2"
-          value={pageSize}
-          onChange={(e) => {
-            setPageSize(Number(e.target.value));
-            setPage(1); // Reset to page 1 when changing page size
-          }}
+      <div className="text-center my-2">
+        Page {page} of {Math.ceil(totalRecords / pageSize)}
+      </div>
+
+      <div className="d-flex justify-content-between mt-4">
+        <button
+          className="btn btn-outline-secondary"
+          disabled={page === 1}
+          onClick={() => setPage((p) => p - 1)}
         >
-          <option value={5}>5</option>
-          <option value={10}>10</option>
-          <option value={20}>20</option>
-        </select>
+          &laquo; Prev
+        </button>
+        <button
+          className="btn btn-outline-secondary"
+          disabled={page >= Math.ceil(totalRecords / pageSize)}
+          onClick={() => setPage((p) => p + 1)}
+        >
+          Next &raquo;
+        </button>
       </div>
+
+      {/* ✅ Bootstrap Toast (New Feature) */}
+      <ToastContainer position="top-end" className="p-3">
+        <Toast show={showToast} onClose={() => setShowToast(false)} delay={3000} autohide>
+          <Toast.Header>
+            <strong className="me-auto">Bookstore</strong>
+            <small>Just Now</small>
+          </Toast.Header>
+          <Toast.Body>✅ Book added to cart!</Toast.Body>
+        </Toast>
+      </ToastContainer>
     </div>
   );
 };
