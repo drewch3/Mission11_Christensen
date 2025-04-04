@@ -3,6 +3,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import BookList from './components/BookList';
 import CartPage from './components/CartPage'; // <-- Create this next
+import AdminBooks from './components/AdminBooks';
 
 const App: React.FC = () => {
   return (
@@ -11,10 +12,12 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<BookList />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/adminbooks" element={<AdminBooks />} />
       </Routes>
     </Router>
   );
 };
+
 
 export default App;
 

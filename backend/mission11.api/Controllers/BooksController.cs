@@ -18,6 +18,42 @@ namespace mission11.API.Controllers
             _context = context;
         }
 
+        [HttpPost]
+        public IActionResult AddBook([FromBody] Book newBook)
+        {
+            _context.Books.Add(newBook);
+            _context.SaveChanges();
+            return Ok(newBook);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateBook(int id, [FromBody] Book updatedBook)
+        {
+            var existing = _context.Books.FirstOrDefault(b => b.BookID == id);
+            if (existing == null) return NotFound();
+
+            existing.Title = updatedBook.Title;
+            existing.Author = updatedBook.Author;
+            existing.Price = updatedBook.Price;
+            existing.Category = updatedBook.Category;
+            existing.Classification = updatedBook.Classification;
+
+            _context.SaveChanges();
+            return Ok(existing);
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteBook(int id)
+        {
+            var book = _context.Books.FirstOrDefault(b => b.BookID == id);
+            if (book == null) return NotFound();
+
+            _context.Books.Remove(book);
+            _context.SaveChanges();
+            return Ok();
+        }
+
+
         // ✅ Get a paginated list of books with optional category and sorting
         [HttpGet]
         public async Task<IActionResult> GetBooks(
@@ -82,4 +118,5 @@ namespace mission11.API.Controllers
             return Ok(categories);
         }
     }
+    
 }

@@ -7,6 +7,7 @@ import CartSummary from './CartSummary';
 import CategoryFilter from './CategoryFilter';
 import { Book, CartItem } from '../types';
 import { Toast, ToastContainer } from 'react-bootstrap'; // ✅ Import Toast
+import { Link } from 'react-router-dom';
 
 const BookList: React.FC = () => {
   const [books, setBooks] = useState<Book[]>([]);
@@ -57,6 +58,16 @@ const BookList: React.FC = () => {
 
   return (
     <div className="container mt-4">
+
+      {/* ✅ Admin Panel Button */}
+      <div className="text-end">
+        <Link to="/adminbooks">
+          <button className="btn btn-outline-primary mb-3">
+            Go to Admin Panel
+          </button>
+        </Link>
+      </div>
+
       <CartSummary cart={cart} />
       <CategoryFilter
         categories={categories}
