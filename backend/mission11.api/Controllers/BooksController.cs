@@ -55,14 +55,15 @@ namespace mission11.API.Controllers
 
 
         // ✅ Get a paginated list of books with optional category and sorting
-        [HttpGet]
-        public async Task<IActionResult> GetBooks(
+        [HttpGet("GetBooks")]
+        public IActionResult GetBooks(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 6,
             [FromQuery] string? sortBy = "Title",
             [FromQuery] string sortOrder = "asc",
             [FromQuery] string? category = null)
-        {
+        {   
+            try {
             if (pageNumber < 1) pageNumber = 1;
             if (pageSize < 1) pageSize = 1;
 
@@ -87,13 +88,13 @@ namespace mission11.API.Controllers
             }
 
             // ✅ Get total record count before applying pagination
-            var totalRecords = await query.CountAsync();
+            var totalRecords =  query.Count();
 
             // ✅ Apply pagination
-            var books = await query
+            var books =  query
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .ToListAsync();
+                .ToList();
 
             return Ok(new
             {
@@ -102,18 +103,23 @@ namespace mission11.API.Controllers
                 pageSize,
                 books
             });
+            } 
+            catch (Exception ex)
+    {
+        return StatusCode(500, $"Server error: {ex.Message}");
+    }
         }
 
         // ✅ Get distinct list of categories for filtering
         [HttpGet("categories")]
-        public async Task<IActionResult> GetCategories()
+        public IActionResult GetCategories()
         {
-            var categories = await _context.Books
+            var categories = _context.Books
                 .Select(b => b.Category)
                 .Where(c => c != null)
                 .Distinct()
                 .OrderBy(c => c)
-                .ToListAsync();
+                .ToList();
 
             return Ok(categories);
         }

@@ -70,3 +70,5 @@ C:\Users\drewc\OneDrive\Documents\IS 413\Mission11_Christensen\backend\mission11
 C:\Users\drewc\OneDrive\Documents\IS 413\Mission11_Christensen\backend\mission11.api\obj\release\net8.0\mission11.API.pdb
 C:\Users\drewc\OneDrive\Documents\IS 413\Mission11_Christensen\backend\mission11.api\obj\release\net8.0\mission11.API.genruntimeconfig.cache
 C:\Users\drewc\OneDrive\Documents\IS 413\Mission11_Christensen\backend\mission11.api\obj\release\net8.0\ref\mission11.API.dll
+C:\Users\drewc\OneDrive\Documents\IS 413\Mission11_Christensen\backend\mission11.api\bin\Release\net8.0\package-lock.json
+C:\Users\drewc\OneDrive\Documents\IS 413\Mission11_Christensen\backend\mission11.api\bin\Release\net8.0\package.json

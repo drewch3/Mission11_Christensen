@@ -1,6 +1,8 @@
 C:\Users\drewc\OneDrive\Documents\IS 413\Mission11_Christensen\backend\mission11.api\publish\mission11.API.exe
 C:\Users\drewc\OneDrive\Documents\IS 413\Mission11_Christensen\backend\mission11.api\publish\appsettings.Development.json
 C:\Users\drewc\OneDrive\Documents\IS 413\Mission11_Christensen\backend\mission11.api\publish\appsettings.json
+C:\Users\drewc\OneDrive\Documents\IS 413\Mission11_Christensen\backend\mission11.api\publish\package-lock.json
+C:\Users\drewc\OneDrive\Documents\IS 413\Mission11_Christensen\backend\mission11.api\publish\package.json
 C:\Users\drewc\OneDrive\Documents\IS 413\Mission11_Christensen\backend\mission11.api\publish\Bookstore.sqlite
 C:\Users\drewc\OneDrive\Documents\IS 413\Mission11_Christensen\backend\mission11.api\publish\mission11.API.dll
 C:\Users\drewc\OneDrive\Documents\IS 413\Mission11_Christensen\backend\mission11.api\publish\mission11.API.deps.json

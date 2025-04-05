@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 const AdminBooks = () => {
   const [books, setBooks] = useState<Book[]>([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [editBookId, setEditBookId] = useState<number | null>(null);
+ const [editBookId, setEditBookId] = useState<number | null>(null);
 
   const [newBook, setNewBook] = useState<Book>({
     bookID: 0,
