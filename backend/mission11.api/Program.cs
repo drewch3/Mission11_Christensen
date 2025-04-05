@@ -24,6 +24,4 @@ var app = builder.Build();
 app.UseCors("AllowReactApp");
 app.UseAuthorization();
 app.MapControllers();
-app.Run();
-
-
+app.Run(); 
